@@ -1,0 +1,197 @@
+/* ==========================
+   GENERAL STYLES
+========================== */
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Roboto", sans-serif;
+  background-color: #1f2f41; /* soft navy-dark */
+  color: #f0f0f0;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ==========================
+   APP HEADER
+========================== */
+.app-header {
+  background: linear-gradient(90deg, #2c445d, #1f2f41);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.tab-buttons button {
+  margin-left: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3a556d;
+  color: #f0f0f0;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-buttons button.active-tab,
+.tab-buttons button:hover {
+  background-color: #4a6e8c;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ==========================
+   LOGIN CARD
+========================== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 20px;
+}
+
+.login-card {
+  background: #2c445d;
+  padding: 40px 30px;
+  border-radius: 12px;
+  width: 360px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-3px);
+}
+
+.login-card input {
+  width: 90%;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background-color: #3a556d;
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+.login-card input::placeholder {
+  color: #c0c0c0;
+}
+
+.login-card button {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #4a6e8c;
+  color: #f0f0f0;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-card button:hover {
+  background-color: #5c85a2;
+}
+
+.success-msg {
+  color: #4caf50;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.error-msg {
+  color: #ff6b6b;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.login-card .hint {
+  font-size: 13px;
+  color: #c0c0c0;
+  margin-top: 15px;
+}
+
+/* ==========================
+   DASHBOARD
+========================== */
+.dashboard-container {
+  width: 95%;
+  margin: 20px auto;
+}
+
+.dashboard-header {
+  margin-bottom: 15px;
+}
+
+.dashboard-header h2 {
+  color: #f0f0f0;
+  margin-bottom: 5px;
+}
+
+.dashboard-header p.user {
+  color: #b0c7db;
+  font-size: 14px;
+}
+
+/* Filters */
+.filters {
+  margin-bottom: 15px;
+}
+
+.filters button {
+  margin-right: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  background-color: #3a556d;
+  color: #f0f0f0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filters button.active-filter,
+.filters button:hover {
+  background-color: #4a6e8c;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Table */
+.table-wrapper {
+  overflow-x: auto;
+  background-color: #2c445d;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+th, td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #3a556d;
+  text-align: left;
+}
+
+th {
+  background-color: #2c445d;
+  font-weight: 600;
+}
+
+/* Status message */
+.status {
+  color: #ff6b6b;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
