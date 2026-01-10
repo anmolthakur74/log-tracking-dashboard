@@ -31,7 +31,11 @@ public class LogController {
     private final String DEMO_USERNAME = "demoUser";
     private final String DEMO_PASSWORD = "demoPass123";
 
-    // Get logs
+    private final int MAX_LOGS = 500; // optional log limit
+
+    // -----------------------
+    // GET logs
+    // -----------------------
     @GetMapping
     public List<Map<String, String>> getLogs(@RequestParam(defaultValue = "50") int limit) {
         int size = logs.size();
@@ -39,7 +43,9 @@ public class LogController {
         return logs.subList(fromIndex, size);
     }
 
-    // Login endpoint
+    // -----------------------
+    // POST login
+    // -----------------------
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> payload) {
         String username = payload.getOrDefault("username", "Unknown");
@@ -60,28 +66,28 @@ public class LogController {
                 int attempts = failedAttempts.getOrDefault(username, 0) + 1;
                 failedAttempts.put(username, attempts);
 
-                if (attempts >= 3) {
-                    logLevel = "ERROR";
-                } else {
-                    logLevel = "WARNING";
-                }
+                logLevel = (attempts >= 3) ? "ERROR" : "WARNING";
                 logMessage = String.format("[%s] Failed login attempt by %s", logLevel, username);
                 response.put("status", "error");
                 response.put("message", "Invalid credentials!");
             }
 
             saveLog(logMessage);
+
         } catch (Exception e) {
-            saveLog(String.format("[ERROR] Backend failed to log for %s: %s", username, e.getMessage()));
+            String errorLog = String.format("[ERROR] Backend failed to log for %s: %s", username, e.getMessage());
+            saveLog(errorLog);
         }
 
         return response;
     }
 
-    // New endpoint to receive queued frontend logs
+    // -----------------------
+    // POST frontend logs (queued)
+    // -----------------------
     @PostMapping("/frontend-log")
     public Map<String, String> receiveFrontendLog(@RequestBody Map<String, String> log) {
-        String timestamp = log.getOrDefault("timestamp", LocalDateTime.now().toString());
+        String timestamp = log.getOrDefault("timestamp", now());
         String message = log.getOrDefault("message", "[ERROR] Unknown frontend log");
 
         Map<String, String> logEntry = new HashMap<>();
@@ -89,17 +95,37 @@ public class LogController {
         logEntry.put("message", message);
 
         logs.add(logEntry);
+        trimLogs();
 
         Map<String, String> response = new HashMap<>();
         response.put("status", "success");
         return response;
     }
 
-    // Helper method to save logs
+    // -----------------------
+    // Helper to save logs
+    // -----------------------
     private void saveLog(String message) {
         Map<String, String> logEntry = new HashMap<>();
-        logEntry.put("timestamp", LocalDateTime.now().toString());
+        logEntry.put("timestamp", now());
         logEntry.put("message", message);
         logs.add(logEntry);
+        trimLogs();
+    }
+
+    // -----------------------
+    // Helper: current timestamp
+    // -----------------------
+    private String now() {
+        return LocalDateTime.now().toString();
+    }
+
+    // -----------------------
+    // Optional: limit log size
+    // -----------------------
+    private void trimLogs() {
+        if (logs.size() > MAX_LOGS) {
+            logs.subList(0, logs.size() - MAX_LOGS).clear();
+        }
     }
 }
