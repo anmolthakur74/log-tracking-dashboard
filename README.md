@@ -1,47 +1,35 @@
-# Log Tracking Dashboard
+# LogMonitor
 
-**Simulates real-time log monitoring for applications.**
-
----
+Simulates real-time log monitoring for applications. Users can log in using demo credentials, and developers/testers can view and filter login/system events in real time. 
 
 ## Demo
+- **User Login:** Enter demo credentials to simulate login events.  
+- **Developer Dashboard:** View all login and system events in real time with filters for INFO, WARNING, and ERROR logs.  
 
-- **User Login:** Enter demo credentials to simulate login events.
-- **Developer Dashboard:** View all login and system events in real time with filters for INFO, WARNING, and ERROR logs.
-
----
+🔗 **Live Demo:** [https://logmonitor.netlify.app/](https://logmonitor.netlify.app/)  
 
 ## Tech Stack
-
-- **Frontend:** React.js
-- **Backend:** Spring Boot (Java)
-- **APIs:** REST endpoints for logging and fetching logs
-- **Build / Dependency Management:** Maven
-
----
+- **Frontend:** React.js  
+- **Backend:** Spring Boot (Java)  
+- **APIs:** REST endpoints for logging and fetching logs  
+- **Build / Dependency Management:** Maven  
+- **Deployment:** Docker (backend), Netlify (frontend)
 
 ## Features
-
-- Demo login page with predefined credentials
-- Backend decides log types (INFO/WARNING/ERROR)
-- Real-time developer/tester dashboard
-- Filter logs by type
-- Backend stores logs in memory (demo purpose)
-
----
+- Demo login page with predefined credentials (`demoUser` / `demoPass123`)  
+- Backend evaluates login attempts and generates `[INFO]`, `[WARNING]`, `[ERROR]` logs  
+- Real-time developer/tester dashboard with filtering by log type  
+- Backend stores logs in memory for demo purposes
+- Handles backend downtime gracefully (friendly messages on frontend)
 
 ## How It Works
-
-1. User attempts login using demo credentials.
-2. Backend evaluates login:
-   - Correct login → `[INFO]` log
-   - Wrong password → `[WARNING]` log
+1. User attempts login using demo credentials.  
+2. Backend evaluates login:  
+   - Correct login → `[INFO]` log  
+   - Wrong password → `[WARNING]` log  
    - 3+ consecutive failures → `[ERROR]` log
-   - Backend down → `[ERROR]` log
-3. Logs are displayed in the developer dashboard in real time.
-4. Dashboard allows filtering by log type (INFO, WARNING, ERROR).
-
----
+   - If backend is unreachable → frontend shows “Backend unreachable” message
+3. Logs are displayed in real time on the developer dashboard.
 
 ## How to Run Locally
 
@@ -59,4 +47,5 @@
    ```
 
 ## Author
+
 Anmol Thakur
