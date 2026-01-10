@@ -8,7 +8,7 @@ function App() {
   const [activeTab, setActiveTab] = useState("login");
   const [retryQueue, setRetryQueue] = useState([]);
 
-  const API_BASE = "https://log-tracking-dashboard.onrender.com";
+  const API_BASE = "https://invalid-backend-url.test";
 
   // Function to flush queued logs
   const flushRetryQueue = useCallback(async () => {
