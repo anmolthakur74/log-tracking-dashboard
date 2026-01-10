@@ -1,38 +1,43 @@
 import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 
-function Dashboard() {
+function Dashboard({ apiBase, queueBackendErrorLog }) {
   const [logs, setLogs] = useState([]);
   const [filter, setFilter] = useState("ALL");
   const [status, setStatus] = useState("");
 
+  // Fetch logs from backend
   const fetchLogs = async () => {
     try {
-      const res = await fetch("http://localhost:8080/logs?limit=100");
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const res = await axios.get(`${apiBase}/logs?limit=100`);
+      const data = res.data;
 
-      // sort newest first (LOGIC)
+      // Sort newest first
       const sorted = [...data].sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
       );
 
       setLogs(sorted);
       setStatus("");
-    } catch {
-      setStatus("Backend unreachable. Logs cannot be loaded.");
+    } catch (err) {
+      setStatus("Logs cannot be loaded. Please try again later.");
+      console.error("[Dashboard] Backend unreachable:", err);
+
+      // Queue a log for backend recovery
+      queueBackendErrorLog("[ERROR] Backend unreachable. Logs could not be loaded.");
     }
   };
 
+  // Fetch logs every 5 seconds
   useEffect(() => {
     fetchLogs();
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // LOGIC: safe filtering
+  // Filter logs safely
   const filteredLogs = useMemo(() => {
     if (filter === "ALL") return logs;
-
     return logs.filter((log) =>
       log.message?.toUpperCase().includes(`[${filter}]`)
     );
@@ -74,7 +79,10 @@ function Dashboard() {
               </tr>
             ) : (
               filteredLogs.map((log, i) => (
-                <tr key={i}>
+                <tr
+                  key={i}
+                  className={log.message.includes("Backend unreachable") ? "queued-log" : ""}
+                >
                   <td>{log.timestamp}</td>
                   <td>{log.message}</td>
                 </tr>
