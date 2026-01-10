@@ -1,71 +1,52 @@
 import React, { useState } from "react";
-import axios from "axios";
+import LoginPage from "./LoginPage";
+import Dashboard from "./Dashboard";
 
-function LoginPage({ apiBase, queueBackendErrorLog }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState(""); // success or error
+function App() {
+  const [activeTab, setActiveTab] = useState("login");
+  const API_BASE = "https://log-tracking-dashboard.onrender.com"; // Render backend URL
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      setMessage("Please enter username and password.");
-      setStatus("error");
-      return;
-    }
+  // Queue for backend-unreachable logs
+  const [queuedLogs, setQueuedLogs] = useState([]);
 
-    try {
-      const res = await axios.post(`${apiBase}/logs/login`, { username, password });
-      const data = res.data;
-
-      setMessage(data.message);
-      setStatus(data.status);
-      setUsername("");
-      setPassword("");
-    } catch (err) {
-      // Backend unreachable → queue a log
-      const logMessage = `[ERROR] Backend unreachable during login attempt for user ${username}`;
-      queueBackendErrorLog(logMessage);
-
-      setMessage("Backend unreachable. Try again later.");
-      setStatus("error");
-      console.error("[LoginPage] Backend unreachable:", err);
-    }
+  const queueBackendErrorLog = (message) => {
+    const log = {
+      timestamp: new Date().toISOString(),
+      message,
+    };
+    setQueuedLogs((prev) => [log, ...prev]);
+    console.warn("[Queued Log]", log);
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
+    <div className="app">
+      <header className="app-header">
         <h1>LogMonitor</h1>
-        <p className="subtitle">Simulated login for monitoring logs</p>
+        <div className="tab-buttons">
+          <button
+            className={activeTab === "login" ? "active-tab" : ""}
+            onClick={() => setActiveTab("login")}
+          >
+            User Login
+          </button>
+          <button
+            className={activeTab === "dashboard" ? "active-tab" : ""}
+            onClick={() => setActiveTab("dashboard")}
+          >
+            Developer Dashboard
+          </button>
+        </div>
+      </header>
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button onClick={handleLogin}>Login</button>
-
-        {message && (
-          <p className={status === "success" ? "success-msg" : "error-msg"}>
-            {message}
-          </p>
+      <main className="app-main">
+        {activeTab === "login" ? (
+          <LoginPage apiBase={API_BASE} queueBackendErrorLog={queueBackendErrorLog} />
+        ) : (
+          <Dashboard apiBase={API_BASE} queuedLogs={queuedLogs} />
         )}
-
-        <p className="hint">
-          Demo credentials: <b>demoUser / demoPass123</b>
-        </p>
-      </div>
+      </main>
     </div>
   );
 }
 
-export default LoginPage;
+export default App;
