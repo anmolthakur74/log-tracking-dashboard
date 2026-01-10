@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 
 function Dashboard({ apiBase }) {
@@ -6,7 +6,7 @@ function Dashboard({ apiBase }) {
   const [filter, setFilter] = useState("ALL");
   const [status, setStatus] = useState("");
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const res = await axios.get(`${apiBase}/logs?limit=100`);
       setLogs(res.data.reverse());
@@ -14,13 +14,13 @@ function Dashboard({ apiBase }) {
     } catch {
       setStatus("Logs cannot be loaded. Please try again later.");
     }
-  };
+  }, [apiBase]);
 
   useEffect(() => {
     fetchLogs();
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchLogs]);
 
   const filteredLogs = useMemo(() => {
     if (filter === "ALL") return logs;
