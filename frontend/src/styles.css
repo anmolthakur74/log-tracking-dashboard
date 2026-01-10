@@ -195,3 +195,9 @@ th {
   margin-bottom: 12px;
   font-weight: 500;
 }
+
+/* Queued logs due to backend downtime */
+.queued-log {
+  color: #ffad33; /* amber/orange for warnings */
+  font-style: italic;
+}
