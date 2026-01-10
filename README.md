@@ -1,12 +1,12 @@
 # LogMonitor
 
-Simulates real-time log monitoring for applications. Users can log in using demo credentials, and developers/testers can view and filter login/system events in real time. 
+Simulates real-time log monitoring for applications. Users can log in using demo credentials, and developers/testers can view and filter system events in real time. 
 
 ## Demo
 - **User Login:** Enter demo credentials to simulate login events.  
 - **Developer Dashboard:** View all login and system events in real time with filters for INFO, WARNING, and ERROR logs.  
 
-🔗 **Live Demo:** [https://logmonitor.netlify.app/](https://logmonitor.netlify.app/)  
+**Live Demo:** [https://logmonitor.netlify.app/](https://logmonitor.netlify.app/)  
 
 ## Tech Stack
 - **Frontend:** React.js  
@@ -28,7 +28,6 @@ Simulates real-time log monitoring for applications. Users can log in using demo
    - Correct login → `[INFO]` log  
    - Wrong password → `[WARNING]` log  
    - 3+ consecutive failures → `[ERROR]` log
-   - If backend is unreachable → frontend shows “Backend unreachable” message
 3. Logs are displayed in real time on the developer dashboard.
 
 ## How to Run Locally
