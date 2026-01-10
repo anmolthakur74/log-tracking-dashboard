@@ -1,50 +1,42 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 
-function Dashboard({ apiBase, queuedLogs }) {
+function Dashboard({ apiBase, queueBackendErrorLog }) {
   const [logs, setLogs] = useState([]);
   const [filter, setFilter] = useState("ALL");
   const [status, setStatus] = useState("");
 
-  // Fetch logs from backend
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const res = await axios.get(`${apiBase}/logs?limit=100`);
       const data = res.data;
 
-      // Sort newest first
       const sorted = [...data].sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
       );
 
       setLogs(sorted);
-      setStatus(""); // Clear error status if successful
+      setStatus("");
     } catch (err) {
       setStatus("Logs cannot be loaded. Please try again later.");
       console.error("[Dashboard] Backend unreachable:", err);
-    }
-  };
 
-  // Fetch logs every 5 seconds
+      queueBackendErrorLog("[ERROR] Backend unreachable. Logs could not be loaded.");
+    }
+  }, [apiBase, queueBackendErrorLog]);
+
   useEffect(() => {
     fetchLogs();
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchLogs]);
 
-  // Merge backend logs with queued logs for simulation
-  const allLogs = useMemo(() => {
-    // queuedLogs is from App.js prop
-    return [...(queuedLogs || []), ...logs];
-  }, [logs, queuedLogs]);
-
-  // Filter logs safely
   const filteredLogs = useMemo(() => {
-    if (filter === "ALL") return allLogs;
-    return allLogs.filter((log) =>
+    if (filter === "ALL") return logs;
+    return logs.filter((log) =>
       log.message?.toUpperCase().includes(`[${filter}]`)
     );
-  }, [allLogs, filter]);
+  }, [logs, filter]);
 
   return (
     <div className="dashboard-container">
@@ -53,7 +45,6 @@ function Dashboard({ apiBase, queuedLogs }) {
         <p className="user">Monitoring all login & system events</p>
       </div>
 
-      {/* Log type filters */}
       <div className="filters">
         {["ALL", "INFO", "WARNING", "ERROR"].map((f) => (
           <button
@@ -66,10 +57,8 @@ function Dashboard({ apiBase, queuedLogs }) {
         ))}
       </div>
 
-      {/* Backend status */}
       {status && <p className="status">{status}</p>}
 
-      {/* Logs table */}
       <div className="table-wrapper">
         <table>
           <thead>
@@ -87,9 +76,7 @@ function Dashboard({ apiBase, queuedLogs }) {
               filteredLogs.map((log, i) => (
                 <tr
                   key={i}
-                  className={
-                    log.message.includes("Backend unreachable") ? "queued-log" : ""
-                  }
+                  className={log.message.includes("Backend unreachable") ? "queued-log" : ""}
                 >
                   <td>{log.timestamp}</td>
                   <td>{log.message}</td>
