@@ -1,27 +1,35 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-function LoginPage() {
+function LoginPage({ apiBase, queueBackendErrorLog }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState(""); // success or error
 
   const handleLogin = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/logs/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+    if (!username || !password) {
+      setMessage("Please enter username and password.");
+      setStatus("error");
+      return;
+    }
 
-      const data = await res.json();
+    try {
+      const res = await axios.post(`${apiBase}/logs/login`, { username, password });
+      const data = res.data;
+
       setMessage(data.message);
       setStatus(data.status);
       setUsername("");
       setPassword("");
     } catch (err) {
+      // Backend unreachable → queue a log
+      const logMessage = `[ERROR] Backend unreachable during login attempt for user ${username}`;
+      queueBackendErrorLog(logMessage);
+
       setMessage("Backend unreachable. Try again later.");
       setStatus("error");
+      console.error("[LoginPage] Backend unreachable:", err);
     }
   };
 
