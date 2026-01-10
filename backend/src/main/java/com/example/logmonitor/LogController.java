@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,7 +39,7 @@ public class LogController {
         return logs.subList(fromIndex, size);
     }
 
-    // Login endpoint: frontend sends username + password
+    // Login endpoint
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> payload) {
         String username = payload.getOrDefault("username", "Unknown");
@@ -49,44 +49,57 @@ public class LogController {
         String logMessage;
         String logLevel;
 
-        // Check credentials
-        if (DEMO_USERNAME.equals(username) && DEMO_PASSWORD.equals(password)) {
-            // Successful login
-            logLevel = "INFO";
-            logMessage = String.format("[%s] User %s logged in successfully", logLevel, username);
-            failedAttempts.put(username, 0); // reset failed attempts
-            response.put("status", "success");
-            response.put("message", "Login successful!");
-        } else {
-            // Failed login
-            int attempts = failedAttempts.getOrDefault(username, 0) + 1;
-            failedAttempts.put(username, attempts);
-
-            if (attempts >= 3) {
-                logLevel = "ERROR"; // 3+ fails → ERROR
+        try {
+            if (DEMO_USERNAME.equals(username) && DEMO_PASSWORD.equals(password)) {
+                logLevel = "INFO";
+                logMessage = String.format("[%s] User %s logged in successfully", logLevel, username);
+                failedAttempts.put(username, 0); // reset failed attempts
+                response.put("status", "success");
+                response.put("message", "Login successful!");
             } else {
-                logLevel = "WARNING"; // first or second fail → WARNING
+                int attempts = failedAttempts.getOrDefault(username, 0) + 1;
+                failedAttempts.put(username, attempts);
+
+                if (attempts >= 3) {
+                    logLevel = "ERROR";
+                } else {
+                    logLevel = "WARNING";
+                }
+                logMessage = String.format("[%s] Failed login attempt by %s", logLevel, username);
+                response.put("status", "error");
+                response.put("message", "Invalid credentials!");
             }
 
-            logMessage = String.format("[%s] Failed login attempt by %s", logLevel, username);
-            response.put("status", "error");
-            response.put("message", "Invalid credentials!");
-        }
-
-        // Save log
-        try {
-            Map<String, String> logEntry = new HashMap<>();
-            logEntry.put("timestamp", LocalDateTime.now().toString());
-            logEntry.put("message", logMessage);
-            logs.add(logEntry);
+            saveLog(logMessage);
         } catch (Exception e) {
-            // If backend fails to store log
-            Map<String, String> logEntry = new HashMap<>();
-            logEntry.put("timestamp", LocalDateTime.now().toString());
-            logEntry.put("message", String.format("[ERROR] Backend failed to log for %s", username));
-            logs.add(logEntry);
+            saveLog(String.format("[ERROR] Backend failed to log for %s: %s", username, e.getMessage()));
         }
 
         return response;
+    }
+
+    // New endpoint to receive queued frontend logs
+    @PostMapping("/frontend-log")
+    public Map<String, String> receiveFrontendLog(@RequestBody Map<String, String> log) {
+        String timestamp = log.getOrDefault("timestamp", LocalDateTime.now().toString());
+        String message = log.getOrDefault("message", "[ERROR] Unknown frontend log");
+
+        Map<String, String> logEntry = new HashMap<>();
+        logEntry.put("timestamp", timestamp);
+        logEntry.put("message", message);
+
+        logs.add(logEntry);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        return response;
+    }
+
+    // Helper method to save logs
+    private void saveLog(String message) {
+        Map<String, String> logEntry = new HashMap<>();
+        logEntry.put("timestamp", LocalDateTime.now().toString());
+        logEntry.put("message", message);
+        logs.add(logEntry);
     }
 }
